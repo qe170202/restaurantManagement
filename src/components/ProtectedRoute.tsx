@@ -38,8 +38,16 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
   // Check role permission if required
   if (requiredRole && authState.user?.role !== requiredRole) {
     // Redirect to appropriate page based on user role
-    const redirectPath = authState.user?.role === 'admin' ? '/admin' : '/waiter';
+    const redirectPath = authState.user?.role === 'admin' ? '/' : '/waiter';
     return <Navigate to={redirectPath} replace />;
+  }
+
+  // Auto-redirect based on user role if no specific role required
+  if (!requiredRole && location.pathname === '/') {
+    const redirectPath = authState.user?.role === 'waiter' ? '/waiter' : '/';
+    if (redirectPath !== '/') {
+      return <Navigate to={redirectPath} replace />;
+    }
   }
 
   return <>{children}</>;

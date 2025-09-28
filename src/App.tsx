@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Orders from './pages/Orders';
 import Tables from './pages/Tables';
 import Payment from './pages/Payment';
+import TableManagement from './pages/TableManagement';
 import './App.css';
 
 const { Content } = Layout;
@@ -29,6 +30,12 @@ function App() {
                   <Dashboard />
                 </Content>
               </Layout>
+            </ProtectedRoute>
+          } />
+          
+          <Route path="/waiter" element={
+            <ProtectedRoute requiredRole="waiter">
+              <TableManagement />
             </ProtectedRoute>
           } />
           

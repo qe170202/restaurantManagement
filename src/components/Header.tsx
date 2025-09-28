@@ -112,7 +112,7 @@ const Header = () => {
                 {authState.user?.fullName || 'User'}
               </div>
               <span style={{
-                backgroundColor: '#ff8c00',
+                backgroundColor: authState.user?.role === 'admin' ? '#ff8c00' : '#1890ff',
                 color: '#fff',
                 padding: '2px 8px',
                 borderRadius: '12px',
@@ -125,7 +125,7 @@ const Header = () => {
                 height: '20px'
               }}>
                 <HomeOutlined style={{ fontSize: '10px' }} />
-                Admin
+                {authState.user?.role === 'admin' ? 'Admin' : 'Bồi bàn'}
               </span>
             </div>
           </div>
