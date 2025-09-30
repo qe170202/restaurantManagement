@@ -6,7 +6,8 @@ import {
   ClockCircleOutlined,
   SearchOutlined,
   LeftOutlined,
-  RightOutlined
+  RightOutlined,
+  CalendarOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
 import Header from '../components/Header';
@@ -460,24 +461,33 @@ const TableManagement: React.FC = () => {
                     <div style={{ 
                       display: 'flex', 
                       justifyContent: 'space-between', 
-                      alignItems: 'center',
+                      alignItems: 'flex-start',
                       marginBottom: '20px',
                       flexShrink: 0
                     }}>
-                      <Title level={3} style={{ margin: 0, color: '#333' }}>
-                        Chọn bàn
-                      </Title>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                        <div style={{
-                          background: '#ff8c00',
-                          color: 'white',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: 'bold'
-                        }}>
-                          Ca: Tối
+                      {/* Left: Title and Shift badge */}
+                      <div>
+                        <Title level={3} style={{ margin: 0, color: '#333', textTransform: 'uppercase', lineHeight: 1 }}>
+                          Chọn bàn
+                        </Title>
+                        <div style={{ marginTop: '8px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontSize: '12px', color: '#595959', fontWeight: 500 }}>Ca:</span>
+                          <span style={{
+                            display: 'inline-block',
+                            background: '#ff8c00',
+                            color: 'white',
+                            padding: '4px 12px',
+                            borderRadius: '20px',
+                            fontSize: '12px',
+                            fontWeight: 600
+                          }}>
+                            Tối
+                          </span>
                         </div>
+                      </div>
+
+                      {/* Right: Floor select */}
+                      <div>
                         <Select defaultValue="1" style={{ width: 120 }}>
                           <Option value="1">Tầng 1</Option>
                         </Select>
@@ -490,75 +500,83 @@ const TableManagement: React.FC = () => {
                       justifyContent: 'space-between', 
                       alignItems: 'center',
                       marginBottom: '20px',
-                      padding: '12px',
-                      background: '#f8f9fa',
-                      borderRadius: '8px',
                       flexShrink: 0
                     }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: '#1890ff',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontSize: '12px',
-                          fontWeight: 'bold'
-                        }}>
-                          {tableStatusSummary.empty}
-                        </div>
-                        <Text>Đang trống</Text>
-                      </div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: '#8c8c8c',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontSize: '12px',
-                          fontWeight: 'bold'
-                        }}>
-                          {tableStatusSummary.occupied}
-                        </div>
-                        <Text>Đang dùng</Text>
-                      </div>
-                      
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <div style={{
-                          width: '24px',
-                          height: '24px',
-                          borderRadius: '50%',
-                          background: '#ff4d4f',
-                          display: 'flex',
-                          alignItems: 'center',
-                          justifyContent: 'center',
-                          color: 'white',
-                          fontSize: '12px',
-                          fontWeight: 'bold'
-                        }}>
-                          {tableStatusSummary.reserved}
-                        </div>
-                        <Text>Đặt trước</Text>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '32px' }}>
+                        <Text style={{ fontWeight: 600 }}>
+                          ĐANG TRỐNG:
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginLeft: '8px',
+                            minWidth: '24px',
+                            height: '24px',
+                            padding: '0 8px',
+                            borderRadius: '999px',
+                            color: '#fff',
+                            background: '#1890ff',
+                            fontSize: '12px',
+                            fontWeight: 700
+                          }}>{tableStatusSummary.empty}</span>
+                        </Text>
+                        <Text style={{ fontWeight: 600 }}>
+                          ĐANG DÙNG:
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginLeft: '8px',
+                            minWidth: '24px',
+                            height: '24px',
+                            padding: '0 8px',
+                            borderRadius: '999px',
+                            color: '#fff',
+                            background: '#e0e0e0',
+                            border: '1px solid #bfbfbf',
+                            fontSize: '12px',
+                            fontWeight: 700
+                          }}>{tableStatusSummary.occupied}</span>
+                        </Text>
+                        <Text style={{ fontWeight: 600 }}>
+                          ĐẶT TRƯỚC:
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            marginLeft: '8px',
+                            minWidth: '24px',
+                            height: '24px',
+                            padding: '0 8px',
+                            borderRadius: '999px',
+                            color: '#fff',
+                            background: '#ff4d4f',
+                            fontSize: '12px',
+                            fontWeight: 700
+                          }}>{tableStatusSummary.reserved}</span>
+                        </Text>
                       </div>
 
                       {tableStatusSummary.selected && (
-                        <div style={{
-                          background: '#e6f7ff',
-                          color: '#1890ff',
-                          padding: '4px 12px',
-                          borderRadius: '20px',
-                          fontSize: '12px',
-                          fontWeight: 'bold'
-                        }}>
-                          Đang chọn: {tableStatusSummary.selected}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{
+                            color: '#5B9AEC',
+                            fontWeight: 700,
+                            textTransform: 'uppercase'
+                          }}>Đang chọn:</span>
+                          <span style={{
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            minWidth: '28px',
+                            height: '28px',
+                            padding: '0 10px',
+                            borderRadius: '999px',
+                            background: '#5B9AEC',
+                            color: '#fff',
+                            fontWeight: 700,
+                            fontSize: '12px'
+                          }}>{tableStatusSummary.selected}</span>
                         </div>
                       )}
                     </div>
@@ -599,36 +617,56 @@ const TableManagement: React.FC = () => {
 
           {/* Right Panel - Order Details */}
           <Col span={8}>
-            <Card 
-              title="Đơn hàng" 
-              style={{ height: '100%' }}
-              bodyStyle={{ height: 'calc(100% - 57px)', overflow: 'auto' }}
-            >
-              {/* Date and Time */}
-              <div style={{ 
-                textAlign: 'center', 
-                marginBottom: '24px',
-                padding: '16px',
-                background: '#f9f9f9',
-                borderRadius: '8px'
+            {/* Date/Time box (left) and Previous orders button (right) */}
+            <div style={{ display: 'flex', gap: '16px', marginBottom: '16px' }}>
+              <div style={{
+                flex: 1 ,
+                background: '#fff',
+                borderRadius: '12px',
+                padding: '12px 16px',
+                boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                textAlign: 'left'
               }}>
-                <Text strong style={{ fontSize: '16px' }}>
-                  {new Date().toLocaleDateString('vi-VN')}
-                </Text>
-                <br />
-                <Text type="secondary">
-                  <ClockCircleOutlined /> {currentTime}
-                </Text>
+                <div style={{ 
+                  display: 'grid',
+                  gridTemplateColumns: '24px 1fr',
+                  alignItems: 'center',
+                  columnGap: '8px',
+                  marginBottom: '6px'
+                }}>
+                  <CalendarOutlined style={{ color: '#1890ff', fontSize: '18px' }} />
+                  <Text style={{ justifySelf: 'center' }}>{new Date().toLocaleDateString('vi-VN')}</Text>
+                </div>
+                <div style={{ 
+                  display: 'grid',
+                  gridTemplateColumns: '24px 1fr',
+                  alignItems: 'center',
+                  columnGap: '8px'
+                }}>
+                  <ClockCircleOutlined style={{ color: '#1890ff', fontSize: '18px' }} />
+                  <Text style={{ justifySelf: 'center' }}>{currentTime}</Text>
+                </div>
               </div>
-
-              {/* Previous Order Button */}
               <Button 
                 icon={<ArrowLeftOutlined />}
-                style={{ width: '100%', marginBottom: '24px' }}
+                style={{ 
+                  flex: 3, 
+                  borderRadius: '12px', 
+                  background: '#fff', 
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  padding: '12px 16px',
+                  height: 'auto'
+                }}
               >
-                Đơn hàng trước đó
+                <span style={{ textTransform: 'uppercase', fontWeight: 600 }}>Đơn hàng trước đó</span>
               </Button>
+            </div>
 
+            {/* Order card */}
+            <Card title="Đơn hàng" style={{ height: 'calc(100% - 160px)' }} bodyStyle={{ height: 'calc(100% - 57px)', overflow: 'auto' }}>
               {/* Order Content */}
               {selectedTable ? (
                 <div>
