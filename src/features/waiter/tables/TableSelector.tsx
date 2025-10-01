@@ -42,15 +42,7 @@ const TableSelector: React.FC<TableSelectorProps> = ({ tables, onSelect }) => {
   };
 
   return (
-    <div style={{ 
-      background: '#D9D9D9',
-      borderRadius: '16px',
-      padding: '20px',
-      width: '100%',
-      height: 'auto',
-      display: 'flex',
-      flexDirection: 'column'
-    }}>
+    <div >
       <div style={{ 
         background: 'white',
         borderRadius: '16px',
