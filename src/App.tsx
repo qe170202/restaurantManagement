@@ -1,4 +1,4 @@
-import { Layout } from 'antd';
+import { Layout, App as AntApp } from 'antd';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import ProtectedRoute from './components/ProtectedRoute';
@@ -15,8 +15,9 @@ const { Content } = Layout;
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
+    <AntApp>
+      <AuthProvider>
+        <Router>
         <Routes>
           {/* Public routes */}
           <Route path="/login" element={<Login />} />
@@ -44,8 +45,9 @@ function App() {
           {/* Catch all route */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
-      </Router>
-    </AuthProvider>
+        </Router>
+      </AuthProvider>
+    </AntApp>
   );
 }
 

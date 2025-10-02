@@ -1,16 +1,29 @@
-import React from 'react';
-import { Button, Select, Typography } from 'antd';
-import type { Table } from '../../../types/tableManagement';
+import React, { useState } from 'react';
+import { Button, Select, Typography, Modal } from 'antd';
+import { ExclamationCircleOutlined } from '@ant-design/icons';
+import type { Table, Order } from '../../../types/tableManagement';
 
 const { Text, Title } = Typography;
 const { Option } = Select;
 
 interface TableSelectorProps {
   tables: Table[];
+  currentOrder?: Order | null;
+  hasUnsavedChanges?: boolean;
   onSelect: (tableId: string) => void;
+  onSaveOrder?: () => void;
 }
 
-const TableSelector: React.FC<TableSelectorProps> = ({ tables, onSelect }) => {
+const TableSelector: React.FC<TableSelectorProps> = ({ 
+  tables, 
+  currentOrder, 
+  hasUnsavedChanges = false, 
+  onSelect, 
+  onSaveOrder 
+}) => {
+  const [showConfirmModal, setShowConfirmModal] = useState(false);
+  const [pendingTableId, setPendingTableId] = useState<string | null>(null);
+  
   const safeTables = Array.isArray(tables) ? tables : [];
   const selectedTableName = React.useMemo(
     () => safeTables.find(t => t.status === 'selected')?.name,
@@ -39,6 +52,21 @@ const TableSelector: React.FC<TableSelectorProps> = ({ tables, onSelect }) => {
       default:
         return '#d9d9d9';
     }
+  };
+
+  const handleTableClick = (tableId: string) => {
+    // Kiểm tra nếu đang chuyển sang bàn khác và có thay đổi chưa lưu
+    const currentSelectedTable = safeTables.find(t => t.status === 'selected');
+    const isDifferentTable = !currentSelectedTable || currentSelectedTable.id !== tableId;
+    
+    if (hasUnsavedChanges && currentOrder && currentOrder.items.length > 0 && isDifferentTable) {
+      setPendingTableId(tableId);
+      setShowConfirmModal(true);
+      return;
+    }
+    
+    // Nếu không có thay đổi chưa lưu, chuyển bàn bình thường
+    onSelect(tableId);
   };
 
   return (
@@ -193,18 +221,50 @@ const TableSelector: React.FC<TableSelectorProps> = ({ tables, onSelect }) => {
                 border: table.status === 'selected' ? '2px dashed #1890ff' : '1px solid',
                 fontSize: '12px'
               }}
-              onClick={() => onSelect(table.id)}
+              onClick={() => handleTableClick(table.id)}
             >
               {table.name}
             </Button>
           ))}
         </div>
-      </div>
+        </div>
+
+      {/* Confirmation Modal */}
+      <Modal
+        title="Đơn hàng chưa được lưu"
+        open={showConfirmModal}
+        onOk={() => {
+          if (onSaveOrder) {
+            onSaveOrder();
+          }
+          if (pendingTableId) {
+            onSelect(pendingTableId);
+          }
+          setShowConfirmModal(false);
+          setPendingTableId(null);
+        }}
+        onCancel={() => {
+          if (pendingTableId) {
+            onSelect(pendingTableId);
+          }
+          setShowConfirmModal(false);
+          setPendingTableId(null);
+        }}
+        okText="Lưu và chuyển bàn"
+        cancelText="Bỏ qua và chuyển bàn"
+        centered
+        zIndex={9999}
+        maskClosable={false}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ExclamationCircleOutlined style={{ color: '#ff9500', fontSize: '22px' }} />
+          <span>
+            {currentOrder && `Bạn có thay đổi chưa lưu cho bàn ${currentOrder.tableName}. Bạn có muốn lưu trước khi chuyển sang bàn khác không?`}
+          </span>
+        </div>
+      </Modal>
     </div>
   );
 };
 
 export default TableSelector;
-
- 
-

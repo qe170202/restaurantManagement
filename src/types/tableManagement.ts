@@ -51,11 +51,12 @@ export interface Order {
   waiterId: string;
   waiterName: string;
   items: OrderItem[];
-  status: 'draft' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'paid';
+  status: 'draft' | 'confirmed' | 'preparing' | 'ready' | 'served' | 'paid' | 'saved' | 'completed' | 'cancelled';
   totalAmount: number;
   createdAt: string;
   updatedAt: string;
   notes?: string;
+  savedAt?: string;
 }
 
 export interface TableStatusSummary {

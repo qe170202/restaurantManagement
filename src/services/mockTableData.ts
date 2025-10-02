@@ -23,8 +23,8 @@ export const mockDishes: Dish[] = [
   {
     id: '1',
     name: 'Salad Tuna',
-    price: 500.67,
-    currency: 'GNF',
+    price: 200000,
+    currency: 'VND',
     category: '2',
     image: '/api/placeholder/150/120',
     isAvailable: true,
@@ -33,8 +33,8 @@ export const mockDishes: Dish[] = [
   {
     id: '2',
     name: 'Salad Egg',
-    price: 350.50,
-    currency: 'GNF',
+    price: 350500,
+    currency: 'VND',
     category: '2',
     image: '/api/placeholder/150/120',
     isAvailable: true
@@ -42,8 +42,8 @@ export const mockDishes: Dish[] = [
   {
     id: '3',
     name: 'Wagyu Sate',
-    price: 1200.00,
-    currency: 'GNF',
+    price: 1200000,
+    currency: 'VND',
     category: '4',
     image: '/api/placeholder/150/120',
     isAvailable: true,
@@ -52,8 +52,8 @@ export const mockDishes: Dish[] = [
   {
     id: '4',
     name: 'Wagyu Black Paper',
-    price: 1500.00,
-    currency: 'GNF',
+    price: 1500000,
+    currency: 'VND',
     category: '4',
     image: '/api/placeholder/150/120',
     isAvailable: true,
@@ -62,8 +62,8 @@ export const mockDishes: Dish[] = [
   {
     id: '5',
     name: 'Wagyu',
-    price: 2000.00,
-    currency: 'GNF',
+    price: 2000000,
+    currency: 'VND',
     category: '4',
     image: '/api/placeholder/150/120',
     isAvailable: true,
@@ -72,8 +72,8 @@ export const mockDishes: Dish[] = [
   {
     id: '6',
     name: 'Lẩu Thái',
-    price: 800.00,
-    currency: 'GNF',
+    price: 800000,
+    currency: 'VND',
     category: '3',
     image: '/api/placeholder/150/120',
     isAvailable: true
@@ -81,8 +81,8 @@ export const mockDishes: Dish[] = [
   {
     id: '7',
     name: 'Lẩu Hải Sản',
-    price: 1200.00,
-    currency: 'GNF',
+    price: 1200000,
+    currency: 'VND',
     category: '3',
     image: '/api/placeholder/150/120',
     isAvailable: true
@@ -90,8 +90,8 @@ export const mockDishes: Dish[] = [
   {
     id: '8',
     name: 'Coca Cola',
-    price: 50.00,
-    currency: 'GNF',
+    price: 50000,
+    currency: 'VND',
     category: '5',
     image: '/api/placeholder/150/120',
     isAvailable: true
@@ -99,8 +99,8 @@ export const mockDishes: Dish[] = [
   {
     id: '9',
     name: 'Nước Cam',
-    price: 80.00,
-    currency: 'GNF',
+    price: 80000,
+    currency: 'VND',
     category: '5',
     image: '/api/placeholder/150/120',
     isAvailable: true
@@ -108,8 +108,8 @@ export const mockDishes: Dish[] = [
   {
     id: '10',
     name: 'Bia Tiger',
-    price: 120.00,
-    currency: 'GNF',
+    price: 120000,
+    currency: 'VND',
     category: '5',
     image: '/api/placeholder/150/120',
     isAvailable: true
@@ -160,37 +160,7 @@ export const mockFloors: Floor[] = [
 ];
 
 // Mock orders
-export const mockOrders: Order[] = [
-  {
-    id: '1',
-    tableId: '2',
-    tableName: 'A2',
-    waiterId: '2',
-    waiterName: 'Trần Thị B',
-    items: [
-      {
-        id: '1',
-        dishId: '1',
-        dishName: 'Salad Tuna',
-        quantity: 2,
-        price: 500.67,
-        status: 'served'
-      },
-      {
-        id: '2',
-        dishId: '8',
-        dishName: 'Coca Cola',
-        quantity: 2,
-        price: 50.00,
-        status: 'served'
-      }
-    ],
-    status: 'served',
-    totalAmount: 1101.34,
-    createdAt: '2025-01-19T18:00:00Z',
-    updatedAt: '2025-01-19T19:30:00Z'
-  }
-];
+export const mockOrders: Order[] = [];
 
 // Mock waiter shift
 export const mockWaiterShift: WaiterShift = {
