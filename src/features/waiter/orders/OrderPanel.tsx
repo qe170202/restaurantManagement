@@ -16,6 +16,8 @@ interface OrderPanelProps {
   onSaveOrder?: () => void;
   onCancelOrder?: () => void;
   onPrintBill?: () => void;
+  isHistoryView?: boolean; // New prop to indicate if viewing from history
+  onPaymentComplete?: (tableId: string) => void;
 }
 
 const OrderPanel: React.FC<OrderPanelProps> = ({ 
@@ -27,7 +29,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
   onUpdateQuantity,
   onSaveOrder,
   onCancelOrder,
-  onPrintBill
+  onPrintBill,
+  isHistoryView = false,
+  onPaymentComplete
 }) => {
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
@@ -277,82 +281,152 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
           </div>
         </div>
 
-        {/* Action Buttons */}
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          gap: '12px'
-        }}>
+        {/* Payment Status and Action Buttons */}
+        {isHistoryView ? (
+          // For history view, show status and print button in same row
           <div style={{
             display: 'flex',
-            gap: '12px'
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            padding: '16px',
+            borderTop: '1px solid #f0f0f0',
+            gap: '16px'
           }}>
-            <Button 
-              style={{ 
-                width: '160px',
-                height: '40px',
-                borderRadius: '8px',
-                border: '1px solid #5296E5',
-                color: '#5296E5',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-              onClick={handleSaveOrder}
-            >
-              Lưu
-            </Button>
-            <Button 
-              style={{ 
-                width: '160px',
-                height: '40px',
-                borderRadius: '8px',
-                border: '1px solid #5296E5',
-                color: '#5296E5',
-                fontSize: '14px',
-                fontWeight: '500'
-              }}
-              onClick={handleCancelOrder}
-            >
-              Hủy
-            </Button>
-          </div>
-
-          <div style={{
-            display: 'flex',
-            gap: '12px'
-          }}>
+            <Text style={{ 
+              fontSize: '16px', 
+              fontWeight: 'bold',
+              color: '#FF6F68',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px'
+            }}>
+              {order.status && ['paid', 'completed'].includes(order.status) ? 
+                <>✅ Thanh Toán Thành Công!</> : 
+                <>⏳ Chưa Thanh Toán</>
+              }
+            </Text>
             <Button 
               type="primary"
               style={{ 
-                width: '160px',
-                height: '40px',
-                background: '#52c41a',
-                borderColor: '#52c41a',
+                background: '#141A93',
+                borderColor: '#141A93',
                 borderRadius: '8px',
                 fontWeight: 'bold',
-                fontSize: '14px'
+                fontSize: '14px',
+                color: 'white',
+                minWidth: '120px',
+                height: '40px'
               }}
               onClick={handlePrintBill}
             >
               Xuất hóa đơn
             </Button>
-            <PaymentButton
-              order={order}
-              style={{ 
-                width: '160px',
-                height: '40px',
-                background: '#ff4d4f',
-                borderColor: '#ff4d4f',
-                borderRadius: '8px',
-                fontWeight: 'bold',
-                fontSize: '14px'
-              }}
-            >
-              Thanh toán
-            </PaymentButton>
           </div>
-        </div>
+        ) : (
+          <>
+            {/* Action Buttons for normal view - No payment status shown */}
+            <div style={{
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              gap: '12px',
+              padding: '16px',
+              borderTop: '1px solid #f0f0f0'
+            }}>
+              {order.status && ['paid', 'completed'].includes(order.status) ? (
+                // Only show print bill button for paid orders
+                <Button 
+                  type="primary"
+                  style={{ 
+                    width: '160px',
+                    height: '40px',
+                    background: '#52c41a',
+                    borderColor: '#52c41a',
+                    borderRadius: '8px',
+                    fontWeight: 'bold',
+                    fontSize: '14px'
+                  }}
+                  onClick={handlePrintBill}
+                >
+                  Xuất hóa đơn
+                </Button>
+              ) : (
+                // Show all buttons for unpaid orders
+                <>
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px'
+                  }}>
+                    <Button 
+                      style={{ 
+                        width: '160px',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: '1px solid #5296E5',
+                        color: '#5296E5',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}
+                      onClick={handleSaveOrder}
+                    >
+                      Lưu
+                    </Button>
+                    <Button 
+                      style={{ 
+                        width: '160px',
+                        height: '40px',
+                        borderRadius: '8px',
+                        border: '1px solid #5296E5',
+                        color: '#5296E5',
+                        fontSize: '14px',
+                        fontWeight: '500'
+                      }}
+                      onClick={handleCancelOrder}
+                    >
+                      Hủy
+                    </Button>
+                  </div>
+
+                  <div style={{
+                    display: 'flex',
+                    gap: '12px'
+                  }}>
+                    <Button 
+                      type="primary"
+                      style={{ 
+                        width: '160px',
+                        height: '40px',
+                        background: '#52c41a',
+                        borderColor: '#52c41a',
+                        borderRadius: '8px',
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                      }}
+                      onClick={handlePrintBill}
+                    >
+                      Xuất hóa đơn
+                    </Button>
+                    <PaymentButton
+                      order={order}
+                      onPaymentComplete={onPaymentComplete}
+                      style={{ 
+                        width: '160px',
+                        height: '40px',
+                        background: '#ff4d4f',
+                        borderColor: '#ff4d4f',
+                        borderRadius: '8px',
+                        fontWeight: 'bold',
+                        fontSize: '14px'
+                      }}
+                    >
+                      Thanh toán
+                    </PaymentButton>
+                  </div>
+                </>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Save Order Modal */}

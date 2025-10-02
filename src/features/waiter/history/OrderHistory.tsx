@@ -22,9 +22,10 @@ const { Title, Text } = Typography;
 interface OrderHistoryProps {
   visible: boolean;
   onClose: () => void;
+  onSelectOrder?: (order: Order) => void;
 }
 
-const OrderHistory: React.FC<OrderHistoryProps> = ({ visible, onClose }) => {
+const OrderHistory: React.FC<OrderHistoryProps> = ({ visible, onClose, onSelectOrder }) => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -438,18 +439,25 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ visible, onClose }) => {
           ) : (
             <div>
               {filteredOrders.map((order) => (
-                <div 
-                  key={order.id}
-                  style={{
-                    background: '#fff',
-                    border: '1px solid #000',
-                    borderRadius: '12px',
-                    padding: '16px',
-                    marginBottom: '12px',
-                    boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-                    transition: 'all 0.2s ease'
-                  }}
-                >
+                 <div 
+                   key={order.id}
+                   style={{
+                     background: '#fff',
+                     border: '1px solid #000',
+                     borderRadius: '12px',
+                     padding: '16px',
+                     marginBottom: '12px',
+                     boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
+                     transition: 'all 0.2s ease',
+                     cursor: 'pointer'
+                   }}
+                   onClick={() => {
+                     if (onSelectOrder) {
+                       onSelectOrder(order);
+                       onClose();
+                     }
+                   }}
+                 >
                   {/* Header Row: Order ID + Table Badge + Date */}
                   <div style={{ 
                     display: 'flex', 

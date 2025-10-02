@@ -30,6 +30,7 @@ const WaiterPage: React.FC = () => {
   const [currentTime, setCurrentTime] = useState<string>('');
   const [showOrderHistory, setShowOrderHistory] = useState<boolean>(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState<boolean>(false);
+  const [isViewingHistoryOrder, setIsViewingHistoryOrder] = useState<boolean>(false);
 
   useEffect(() => {
     const updateTime = () => {
@@ -111,6 +112,7 @@ const WaiterPage: React.FC = () => {
     setTables(updatedTables);
     setSelectedTable(tableId);
     setHasUnsavedChanges(false); // Reset khi chuyển bàn
+    setIsViewingHistoryOrder(false); // Reset history view mode
     
     // Kiểm tra saved order trước
     const savedOrders = orderHistoryService.getOrderHistory();
@@ -256,6 +258,23 @@ const WaiterPage: React.FC = () => {
     message.success('Đang xuất hóa đơn...');
   };
 
+  const handlePaymentComplete = (tableId: string) => {
+    // Cập nhật trạng thái bàn về empty sau khi thanh toán thành công
+    const updatedTables = tables.map(table => 
+      table.id === tableId 
+        ? { ...table, status: 'empty' as const }
+        : table
+    );
+    setTables(updatedTables);
+    
+    // Reset current order
+    setCurrentOrder(null);
+    setHasUnsavedChanges(false);
+    setIsViewingHistoryOrder(false);
+    
+    message.success('Đã cập nhật trạng thái bàn');
+  };
+
 
   const handleShowOrderHistory = () => {
     setShowOrderHistory(true);
@@ -306,10 +325,12 @@ const WaiterPage: React.FC = () => {
                 tableFloor={selectedTable ? getTableById(selectedTable)?.floor : undefined}
                 order={currentOrder || undefined}
                 dishes={dishes}
+                isHistoryView={isViewingHistoryOrder}
                 onUpdateQuantity={handleUpdateQuantity}
                 onSaveOrder={handleSaveOrder}
                 onCancelOrder={handleCancelOrder}
                 onPrintBill={handlePrintBill}
+                onPaymentComplete={handlePaymentComplete}
               />
             </Card>
           </Col>
@@ -320,6 +341,13 @@ const WaiterPage: React.FC = () => {
       <OrderHistory 
         visible={showOrderHistory}
         onClose={handleCloseOrderHistory}
+        onSelectOrder={(order) => {
+          // Set the selected table and order
+          setSelectedTable(order.tableId);
+          setCurrentOrder(order);
+          setHasUnsavedChanges(false); // Order from history is already saved
+          setIsViewingHistoryOrder(true); // Mark as viewing history order
+        }}
       />
     </Layout>
   );
