@@ -7,6 +7,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 // Removed legacy pages: Tables, Payment
 import WaiterPage from './pages/WaiterPage';
+import PaymentPage from './features/waiter/payment/PaymentPage';
 // TableManagement removed; using WaiterPage instead   
 
 import './App.css';
@@ -37,6 +38,12 @@ function App() {
           <Route path="/waiter" element={
             <ProtectedRoute requiredRole="waiter">
               <WaiterPage />
+            </ProtectedRoute>
+          } />
+
+          <Route path="/payment" element={
+            <ProtectedRoute requiredRole="waiter">
+              <PaymentPage />
             </ProtectedRoute>
           } />
           

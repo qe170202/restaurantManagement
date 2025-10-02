@@ -57,6 +57,9 @@ export interface Order {
   updatedAt: string;
   notes?: string;
   savedAt?: string;
+  customerName?: string;
+  discountAmount?: number;
+  paymentMethod?: string;
 }
 
 export interface TableStatusSummary {

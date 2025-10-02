@@ -43,14 +43,15 @@ const TableSelector: React.FC<TableSelectorProps> = ({
   const getTableStatusColor = (status: string) => {
     switch (status) {
       case 'empty':
-        return '#1890ff';
+        return '#1890ff'; // Xanh - bàn trống
       case 'selected':
-        return '#52c41a';
+        return '#52c41a'; // Xanh lá - bàn đang chọn
       case 'occupied':
+        return '#e0e0e0'; // Xám - bàn đang dùng (có đơn hàng chưa thanh toán)
       case 'reserved':
-        return '#ff4d4f';
+        return '#ff4d4f'; // Đỏ - bàn đặt trước
       default:
-        return '#d9d9d9';
+        return '#d9d9d9'; // Xám nhạt - default
     }
   };
 
@@ -215,7 +216,7 @@ const TableSelector: React.FC<TableSelectorProps> = ({
                 height: '50px',
                 background: getTableStatusColor(table.status),
                 borderColor: getTableStatusColor(table.status),
-                color: 'white',
+                color: table.status === 'occupied' ? '#333' : 'white', // Màu text đen cho bàn occupied
                 fontWeight: 'bold',
                 borderRadius: '8px',
                 border: table.status === 'selected' ? '2px dashed #1890ff' : '1px solid',

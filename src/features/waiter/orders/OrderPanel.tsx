@@ -1,32 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Typography, Button, Avatar, Modal, notification } from 'antd';
 import { MinusOutlined, PlusOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
-import type { Dish } from '../../../types/tableManagement';
+import type { Dish, Order } from '../../../types/tableManagement';
+import PaymentButton from '../payment/PaymentButton';
 
 const { Title, Text } = Typography;
-
-interface OrderItem {
-  id: string;
-  dishId: string;
-  dishName: string;
-  quantity: number;
-  price: number;
-  image?: string;
-}
-
-interface Order {
-  id: string;
-  tableId: string;
-  tableName: string;
-  waiterId: string;
-  waiterName: string;
-  items: OrderItem[];
-  totalAmount: number;
-  createdAt: string;
-  customerName?: string;
-  discountAmount?: number;
-  paymentMethod?: string;
-}
 
 interface OrderPanelProps {
   hasTable: boolean;
@@ -38,7 +16,6 @@ interface OrderPanelProps {
   onSaveOrder?: () => void;
   onCancelOrder?: () => void;
   onPrintBill?: () => void;
-  onPayment?: () => void;
 }
 
 const OrderPanel: React.FC<OrderPanelProps> = ({ 
@@ -50,93 +27,27 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
   onUpdateQuantity,
   onSaveOrder,
   onCancelOrder,
-  onPrintBill,
-  onPayment
+  onPrintBill
 }) => {
-  // Handle save order with success notification
+  const [showSaveModal, setShowSaveModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+
+  // Handle save order with confirmation
   const handleSaveOrder = () => {
-    if (onSaveOrder) {
-      onSaveOrder();
-      notification.success({
-        message: 'Lưu đơn hàng thành công',
-        description: `Đơn hàng bàn ${tableName} đã được lưu vào lịch sử`,
-        icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-        placement: 'topRight',
-        duration: 3,
-      });
-    }
+    setShowSaveModal(true);
   };
 
   // Handle cancel order with confirmation
   const handleCancelOrder = () => {
-    Modal.confirm({
-      title: 'Xác nhận hủy đơn hàng',
-      content: `Bạn có chắc chắn muốn hủy đơn hàng bàn ${tableName}? Tất cả món ăn đã chọn sẽ bị xóa.`,
-      icon: <ExclamationCircleOutlined style={{ color: '#ff4d4f' }} />,
-      okText: 'Xác nhận hủy',
-      cancelText: 'Không hủy',
-      okType: 'danger',
-      centered: true,
-      onOk() {
-        if (onCancelOrder) {
-          onCancelOrder();
-          notification.info({
-            message: 'Đã hủy đơn hàng',
-            description: `Đơn hàng bàn ${tableName} đã được hủy`,
-            placement: 'topRight',
-            duration: 2,
-          });
-        }
-      },
-    });
+    setShowCancelModal(true);
   };
 
   // Handle print bill with confirmation
   const handlePrintBill = () => {
-    Modal.confirm({
-      title: 'Xuất hóa đơn',
-      content: `Bạn có muốn xuất hóa đơn cho bàn ${tableName}?`,
-      icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
-      okText: 'Xuất hóa đơn',
-      cancelText: 'Hủy',
-      centered: true,
-      onOk() {
-        if (onPrintBill) {
-          onPrintBill();
-          notification.success({
-            message: 'Đang xuất hóa đơn',
-            description: `Hóa đơn bàn ${tableName} đang được tạo`,
-            placement: 'topRight',
-            duration: 3,
-          });
-        }
-      },
-    });
+    setShowPrintModal(true);
   };
 
-  // Handle payment with confirmation
-  const handlePayment = () => {
-    Modal.confirm({
-      title: 'Xác nhận thanh toán',
-      content: `Xác nhận thanh toán cho bàn ${tableName} với tổng tiền ${((order?.totalAmount || 0) - (order?.discountAmount || 30000)).toLocaleString('vi-VN')}đ?`,
-      icon: <CheckCircleOutlined style={{ color: '#ff4d4f' }} />,
-      okText: 'Xác nhận thanh toán',
-      cancelText: 'Hủy',
-      okType: 'primary',
-      centered: true,
-      onOk() {
-        if (onPayment) {
-          onPayment();
-          notification.success({
-            message: 'Thanh toán thành công',
-            description: `Đã thanh toán cho bàn ${tableName}`,
-            placement: 'topRight',
-            duration: 3,
-          });
-        }
-      },
-    });
-  };
   if (!hasTable) {
     return (
       <div style={{
@@ -256,7 +167,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
               
               <div style={{ flex: 1 }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                  <div>
+    <div>
                     <Text strong style={{ display: 'block', marginBottom: '4px' }}>
                       {item.dishName}
                     </Text>
@@ -426,8 +337,8 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
             >
               Xuất hóa đơn
             </Button>
-            <Button 
-              type="primary"
+            <PaymentButton
+              order={order}
               style={{ 
                 width: '160px',
                 height: '40px',
@@ -437,18 +348,109 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
                 fontWeight: 'bold',
                 fontSize: '14px'
               }}
-              onClick={handlePayment}
             >
               Thanh toán
-            </Button>
+            </PaymentButton>
           </div>
         </div>
       </div>
+
+      {/* Save Order Modal */}
+      <Modal
+        title="Xác nhận lưu đơn hàng"
+        open={showSaveModal}
+        onOk={() => {
+          if (onSaveOrder) {
+            onSaveOrder();
+            notification.success({
+              message: 'Lưu đơn hàng thành công',
+              description: `Đơn hàng bàn ${tableName} đã được lưu vào lịch sử`,
+              icon: <CheckCircleOutlined style={{ color: '#52c41a' }} />,
+              placement: 'topRight',
+              duration: 3,
+            });
+          }
+          setShowSaveModal(false);
+        }}
+        onCancel={() => setShowSaveModal(false)}
+        okText="Xác nhận lưu"
+        cancelText="Hủy"
+        okType="primary"
+        centered
+        maskClosable={false}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '22px' }} />
+          <span>
+            Bạn có muốn lưu đơn hàng bàn {tableName} vào lịch sử không?
+          </span>
+        </div>
+      </Modal>
+
+      {/* Cancel Order Modal */}
+      <Modal
+        title="Xác nhận hủy đơn hàng"
+        open={showCancelModal}
+        onOk={() => {
+          if (onCancelOrder) {
+            onCancelOrder();
+            notification.info({
+              message: 'Đã hủy đơn hàng',
+              description: `Đơn hàng bàn ${tableName} đã được hủy`,
+              placement: 'topRight',
+              duration: 2,
+            });
+          }
+          setShowCancelModal(false);
+        }}
+        onCancel={() => setShowCancelModal(false)}
+        okText="Xác nhận hủy"
+        cancelText="Không hủy"
+        okType="danger"
+        centered
+        maskClosable={false}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <ExclamationCircleOutlined style={{ color: '#ff4d4f', fontSize: '22px' }} />
+          <span>
+            Bạn có chắc chắn muốn hủy đơn hàng bàn {tableName}? Tất cả món ăn đã chọn sẽ bị xóa.
+          </span>
+        </div>
+      </Modal>
+
+      {/* Print Bill Modal */}
+      <Modal
+        title="Xuất hóa đơn"
+        open={showPrintModal}
+        onOk={() => {
+          if (onPrintBill) {
+            onPrintBill();
+            notification.success({
+              message: 'Đang xuất hóa đơn',
+              description: `Hóa đơn bàn ${tableName} đang được tạo`,
+              placement: 'topRight',
+              duration: 3,
+            });
+          }
+          setShowPrintModal(false);
+        }}
+        onCancel={() => setShowPrintModal(false)}
+        okText="Xuất hóa đơn"
+        cancelText="Hủy"
+        centered
+        maskClosable={false}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          <CheckCircleOutlined style={{ color: '#52c41a', fontSize: '22px' }} />
+          <span>
+            Bạn có muốn xuất hóa đơn cho bàn {tableName}?
+          </span>
+        </div>
+      </Modal>
+
     </div>
   );
 };
 
 export default OrderPanel;
-
- 
 

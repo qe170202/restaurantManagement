@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Layout, Row, Col, Card, message } from 'antd';
+import { useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { 
@@ -21,6 +22,7 @@ const { Content } = Layout;
 
 const WaiterPage: React.FC = () => {
   const { authState } = useAuth();
+  const location = useLocation();
   const [selectedTable, setSelectedTable] = useState<string | null>(null);
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [dishes] = useState<Dish[]>(mockDishes);
@@ -40,39 +42,117 @@ const WaiterPage: React.FC = () => {
     return () => clearInterval(interval);
   }, []);
 
+  // Cập nhật trạng thái bàn khi component mount
+  useEffect(() => {
+    const updatedTables = tables.map(table => ({
+      ...table,
+      status: getTableStatus(table.id) as any
+    }));
+    setTables(updatedTables);
+  }, []);
+
+  // Xử lý khi quay lại từ trang thanh toán
+  useEffect(() => {
+    if (location.state?.paymentComplete && location.state?.tableId) {
+      const tableId = location.state.tableId;
+      
+      // Cập nhật trạng thái bàn thành trống
+      const updatedTables = tables.map(t => ({
+        ...t,
+        status: t.id === tableId ? 'empty' as const : t.status
+      }));
+      setTables(updatedTables);
+      
+      // Reset selected table và current order nếu đang ở bàn vừa thanh toán
+      if (selectedTable === tableId) {
+        setSelectedTable(null);
+        setCurrentOrder(null);
+      }
+      
+      setHasUnsavedChanges(false);
+      
+      // Clear location state
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state, selectedTable, tables]);
+
   // Menu filtering is now handled inside MenuSection
+
+  const getTableStatus = (tableId: string) => {
+    // Kiểm tra saved orders từ localStorage
+    const savedOrders = orderHistoryService.getOrderHistory();
+    const savedOrder = savedOrders.find((order: Order) => 
+      order.tableId === tableId && 
+      (order.status === 'saved' || order.status === 'confirmed' || order.status === 'preparing' || order.status === 'ready' || order.status === 'served')
+    );
+    
+    // Kiểm tra active orders
+    const activeOrder = orderService.getActiveOrderByTableId(tableId);
+    
+    if (savedOrder && savedOrder.status !== 'paid') {
+      return 'occupied'; // Bàn đang dùng nếu có đơn hàng chưa thanh toán
+    } else if (activeOrder && activeOrder.items.length > 0) {
+      return 'occupied'; // Bàn đang dùng nếu có đơn hàng active
+    } else {
+      return 'empty'; // Bàn trống
+    }
+  };
 
   const handleTableSelect = (tableId: string) => {
     const table = getTableById(tableId);
     if (!table) return;
+    
+    // Cập nhật trạng thái bàn dựa trên logic mới
     const updatedTables = tables.map(t => ({
       ...t,
-      status: t.id === tableId ? 'selected' as const : (t.status === 'selected' ? 'empty' as const : t.status)
+      status: t.id === tableId ? 'selected' as const : 
+              (t.status === 'selected' ? getTableStatus(t.id) as any : t.status)
     }));
     setTables(updatedTables);
     setSelectedTable(tableId);
     setHasUnsavedChanges(false); // Reset khi chuyển bàn
     
-    const existingOrder = orderService.getActiveOrderByTableId(tableId);
-    if (existingOrder) {
-      // Update prices for existing order items with current dish prices
+    // Kiểm tra saved order trước
+    const savedOrders = orderHistoryService.getOrderHistory();
+    const savedOrder = savedOrders.find((order: Order) => 
+      order.tableId === tableId && 
+      (order.status === 'saved' || order.status === 'confirmed' || order.status === 'preparing' || order.status === 'ready' || order.status === 'served')
+    );
+    
+    if (savedOrder) {
+      // Load saved order và update giá
       const updatedOrder = {
-        ...existingOrder,
-        items: existingOrder.items.map(item => {
+        ...savedOrder,
+        items: savedOrder.items.map((item: any) => {
           const currentDish = dishes.find(d => d.id === item.dishId);
           return currentDish ? { ...item, price: currentDish.price } : item;
         })
       };
-      // Recalculate total with updated prices
-      updatedOrder.totalAmount = updatedOrder.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+      updatedOrder.totalAmount = updatedOrder.items.reduce((total: number, item: any) => total + (item.price * item.quantity), 0);
       setCurrentOrder(updatedOrder);
     } else {
-      const newOrder = orderService.createOrderForTable({
-        tableId,
-        waiterId: authState.user?.id || '',
-        waiterName: authState.user?.fullName || ''
-      });
-      setCurrentOrder(newOrder);
+      // Kiểm tra active order
+      const existingOrder = orderService.getActiveOrderByTableId(tableId);
+      if (existingOrder) {
+        // Update prices for existing order items with current dish prices
+        const updatedOrder = {
+          ...existingOrder,
+          items: existingOrder.items.map(item => {
+            const currentDish = dishes.find(d => d.id === item.dishId);
+            return currentDish ? { ...item, price: currentDish.price } : item;
+          })
+        };
+        // Recalculate total with updated prices
+        updatedOrder.totalAmount = updatedOrder.items.reduce((total, item) => total + (item.price * item.quantity), 0);
+        setCurrentOrder(updatedOrder);
+      } else {
+        const newOrder = orderService.createOrderForTable({
+          tableId,
+          waiterId: authState.user?.id || '',
+          waiterName: authState.user?.fullName || ''
+        });
+        setCurrentOrder(newOrder);
+      }
     }
   };
 
@@ -176,9 +256,6 @@ const WaiterPage: React.FC = () => {
     message.success('Đang xuất hóa đơn...');
   };
 
-  const handlePayment = () => {
-    message.success('Chuyển đến màn hình thanh toán');
-  };
 
   const handleShowOrderHistory = () => {
     setShowOrderHistory(true);
@@ -233,7 +310,6 @@ const WaiterPage: React.FC = () => {
                 onSaveOrder={handleSaveOrder}
                 onCancelOrder={handleCancelOrder}
                 onPrintBill={handlePrintBill}
-                onPayment={handlePayment}
               />
             </Card>
           </Col>
