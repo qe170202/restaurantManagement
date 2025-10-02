@@ -3,6 +3,7 @@ import { Typography, Button, Avatar, Modal, notification } from 'antd';
 import { MinusOutlined, PlusOutlined, ExclamationCircleOutlined, CheckCircleOutlined } from '@ant-design/icons';
 import type { Dish, Order } from '../../../types/tableManagement';
 import PaymentButton from '../payment/PaymentButton';
+import { useOrder } from '../../../contexts/OrderContext';
 
 const { Title, Text } = Typography;
 
@@ -33,6 +34,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
   isHistoryView = false,
   onPaymentComplete
 }) => {
+  const ctx = useOrder();
   const [showSaveModal, setShowSaveModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [showPrintModal, setShowPrintModal] = useState(false);
@@ -156,9 +158,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
         WebkitOverflowScrolling: 'touch',
         scrollbarWidth: 'thin'
       }}>
-        {order.items.map((item) => {
+        {(order?.items || ctx.currentOrder?.items || []).map((item) => {
           // Get current dish price from dishes array
-          const currentDish = dishes.find(d => d.id === item.dishId);
+          const currentDish = (dishes.length ? dishes : ctx.dishes).find(d => d.id === item.dishId);
           const currentPrice = currentDish ? currentDish.price : item.price;
 
   return (
@@ -203,7 +205,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
                     shape="circle"
                     size="small"
                     icon={<MinusOutlined />}
-                    onClick={() => onUpdateQuantity?.(item.id, Math.max(0, item.quantity - 1))}
+                    onClick={() => (onUpdateQuantity ?? ctx.updateItemQuantity)?.(item.id, Math.max(0, item.quantity - 1))}
                     style={{
                       background: '#1890ff',
                       borderColor: '#1890ff',
@@ -224,7 +226,7 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
                     shape="circle"
                     size="small"
                     icon={<PlusOutlined />}
-                    onClick={() => onUpdateQuantity?.(item.id, item.quantity + 1)}
+                    onClick={() => (onUpdateQuantity ?? ctx.updateItemQuantity)?.(item.id, item.quantity + 1)}
                     style={{
                       background: '#1890ff',
                       borderColor: '#1890ff',

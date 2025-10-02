@@ -16,6 +16,7 @@ import {
 import dayjs from 'dayjs';
 import orderHistoryService from '../../../services/orderHistoryService';
 import type { Order } from '../../../types/tableManagement';
+import { useOrder } from '../../../contexts/OrderContext';
 
 const { Title, Text } = Typography;
 
@@ -26,6 +27,7 @@ interface OrderHistoryProps {
 }
 
 const OrderHistory: React.FC<OrderHistoryProps> = ({ visible, onClose, onSelectOrder }) => {
+  const { applyHistoryOrder } = useOrder();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filteredOrders, setFilteredOrders] = useState<Order[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -454,8 +456,10 @@ const OrderHistory: React.FC<OrderHistoryProps> = ({ visible, onClose, onSelectO
                    onClick={() => {
                      if (onSelectOrder) {
                        onSelectOrder(order);
-                       onClose();
+                     } else {
+                       applyHistoryOrder(order);
                      }
+                     onClose();
                    }}
                  >
                   {/* Header Row: Order ID + Table Badge + Date */}

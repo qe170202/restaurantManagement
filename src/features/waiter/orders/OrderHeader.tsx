@@ -5,11 +5,21 @@ import { CalendarOutlined, ClockCircleOutlined, LeftOutlined } from '@ant-design
 const { Text } = Typography;
 
 interface OrderHeaderProps {
-  currentTime: string;
   onShowPreviousOrders?: () => void;
 }
 
-const OrderHeader: React.FC<OrderHeaderProps> = ({ currentTime, onShowPreviousOrders }) => {
+const OrderHeader: React.FC<OrderHeaderProps> = ({ onShowPreviousOrders }) => {
+  const [currentTime, setCurrentTime] = React.useState<string>('');
+  React.useEffect(() => {
+    const updateTime = () => {
+      const now = new Date();
+      const timeString = now.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      setCurrentTime(timeString);
+    };
+    updateTime();
+    const interval = setInterval(updateTime, 1000);
+    return () => clearInterval(interval);
+  }, []);
   const now = new Date();
   const dateString = now.toLocaleDateString('vi-VN', {
     day: '2-digit',

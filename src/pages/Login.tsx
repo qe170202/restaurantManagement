@@ -62,7 +62,7 @@ const Login: React.FC = () => {
   };
 
   return (
-    <div style={{
+    <div className="page-enter" style={{
       minHeight: '100vh',
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
       display: 'flex',
@@ -79,6 +79,7 @@ const Login: React.FC = () => {
               border: 'none'
             }}
             bodyStyle={{ padding: '40px' }}
+            className="fade-scale"
           >
             {/* Header */}
             <div style={{ textAlign: 'center', marginBottom: '32px' }}>

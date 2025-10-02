@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Button, Select, Typography, Modal } from 'antd';
 import { ExclamationCircleOutlined } from '@ant-design/icons';
 import type { Table, Order } from '../../../types/tableManagement';
+import { useOrder } from '../../../contexts/OrderContext';
 
 const { Text, Title } = Typography;
 const { Option } = Select;
@@ -21,6 +22,7 @@ const TableSelector: React.FC<TableSelectorProps> = ({
   onSelect, 
   onSaveOrder 
 }) => {
+  const orderCtx = useOrder();
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [pendingTableId, setPendingTableId] = useState<string | null>(null);
   
@@ -60,14 +62,14 @@ const TableSelector: React.FC<TableSelectorProps> = ({
     const currentSelectedTable = safeTables.find(t => t.status === 'selected');
     const isDifferentTable = !currentSelectedTable || currentSelectedTable.id !== tableId;
     
-    if (hasUnsavedChanges && currentOrder && currentOrder.items.length > 0 && isDifferentTable) {
+    if ((hasUnsavedChanges || orderCtx.hasUnsavedChanges) && (currentOrder || orderCtx.currentOrder) && (currentOrder?.items.length || orderCtx.currentOrder?.items.length || 0) > 0 && isDifferentTable) {
       setPendingTableId(tableId);
       setShowConfirmModal(true);
       return;
     }
     
     // Nếu không có thay đổi chưa lưu, chuyển bàn bình thường
-    onSelect(tableId);
+    (orderCtx?.selectTable ?? onSelect)(tableId);
   };
 
   return (
@@ -235,18 +237,16 @@ const TableSelector: React.FC<TableSelectorProps> = ({
         title="Đơn hàng chưa được lưu"
         open={showConfirmModal}
         onOk={() => {
-          if (onSaveOrder) {
-            onSaveOrder();
-          }
+          (orderCtx?.saveOrder ?? onSaveOrder)?.();
           if (pendingTableId) {
-            onSelect(pendingTableId);
+            (orderCtx?.selectTable ?? onSelect)(pendingTableId);
           }
           setShowConfirmModal(false);
           setPendingTableId(null);
         }}
         onCancel={() => {
           if (pendingTableId) {
-            onSelect(pendingTableId);
+            (orderCtx?.selectTable ?? onSelect)(pendingTableId);
           }
           setShowConfirmModal(false);
           setPendingTableId(null);
