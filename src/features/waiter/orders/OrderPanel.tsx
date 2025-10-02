@@ -97,7 +97,10 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
       flexDirection: 'column',
       background: '#fff',
       borderRadius: '16px',
-      overflow: 'hidden'
+      overflow: 'hidden',
+      // Ensure flex children can shrink and allow inner scrolling area to work
+      minHeight: 0,
+      maxHeight: '100%'
     }}>
       {/* Header */}
       <div style={{
@@ -144,9 +147,14 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
 
       {/* Order Items */}
       <div style={{
-        flex: 1,
+        flex: '1 1 0%',
+        minHeight: 0,
         padding: '16px',
-        overflowY: 'auto'
+        overflowY: 'auto',
+        // Improve scroll behavior across browsers/devices
+        overscrollBehavior: 'contain',
+        WebkitOverflowScrolling: 'touch',
+        scrollbarWidth: 'thin'
       }}>
         {order.items.map((item) => {
           // Get current dish price from dishes array
@@ -170,16 +178,15 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
               />
               
               <div style={{ flex: 1 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-    <div>
-                    <Text strong style={{ display: 'block', marginBottom: '4px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', flexWrap: 'wrap' }}>
+                    <Text strong style={{ marginBottom: 0 }}>
                       {item.dishName}
                     </Text>
                     <Text style={{ color: '#ff9500', fontWeight: 'bold' }}>
                       {currentPrice.toLocaleString('vi-VN')}đ
                     </Text>
                   </div>
-                  
                   <Text strong style={{ color: '#1890ff', fontSize: '16px' }}>
                     {(currentPrice * item.quantity).toLocaleString('vi-VN')}đ
                   </Text>
@@ -239,7 +246,9 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
       <div style={{
         padding: '20px',
         borderTop: '1px solid #f0f0f0',
-        background: '#fafafa'
+        background: '#fff',
+        // Prevent footer from shrinking in flex layout
+        flexShrink: 0
       }}>
         {/* Totals */}
         <div style={{ marginBottom: '16px' }}>

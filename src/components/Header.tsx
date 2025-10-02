@@ -96,7 +96,7 @@ const Header = () => {
               size={40} 
               icon={<UserOutlined />} 
               style={{ 
-                backgroundColor: '#faad14',
+                backgroundColor: '#0088FF',
                 border: '2px solid #fff',
                 color: '#fff'
               }}

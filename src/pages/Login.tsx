@@ -19,6 +19,7 @@ import {
   TeamOutlined
 } from '@ant-design/icons';
 import { useAuth } from '../contexts/AuthContext';
+import { getLoginError } from '../services/mockUsers';
 import { useNavigate } from 'react-router-dom';
 
 const { Title, Text } = Typography;
@@ -31,7 +32,22 @@ const Login: React.FC = () => {
   const onFinish = async (values: { username: string; password: string }) => {
     setLoading(true);
     try {
-      const success = await login(values);
+      // Kiểm tra lỗi chi tiết trước khi gọi login
+      const errorType = getLoginError(values.username, values.password);
+      if (errorType === 'USERNAME') {
+        message.error('Tên đăng nhập không tồn tại!');
+        return;
+      }
+      if (errorType === 'PASSWORD') {
+        message.error('Mật khẩu không đúng!');
+        return;
+      }
+
+      // Gọi login với username không phân biệt hoa thường
+      const success = await login({
+        username: values.username.trim().toLowerCase(),
+        password: values.password
+      });
       if (success) {
         message.success('Đăng nhập thành công!');
         navigate('/');
@@ -77,7 +93,7 @@ const Login: React.FC = () => {
                 <ShopOutlined />
               </div>
               <Title level={2} style={{ margin: 0, color: '#262626' }}>
-                ShineWay Restaurant
+                <span style={{ color: '#0088FF' }}>ShineWay</span> Restaurant
               </Title>
               <Text type="secondary" style={{ fontSize: '16px' }}>
                 Hệ thống quản lý nhà hàng

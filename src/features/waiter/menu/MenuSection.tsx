@@ -7,7 +7,6 @@ import { getDishesByCategory } from '../../../services/mockTableData';
 const { Title, Text } = Typography;
 
 interface MenuSectionProps {
-  containerWidth?: number;
   containerHeight?: number;
   categories: { id: string; name: string }[];
   dishes: Dish[];
@@ -15,7 +14,6 @@ interface MenuSectionProps {
 }
 
 export default function MenuSection({
-  containerWidth = 1250,
   containerHeight = 400,
   categories,
   dishes,
@@ -35,11 +33,11 @@ export default function MenuSection({
 
   const onScrollLeft = () => {
     const el = document.getElementById('dishes-scroll');
-    if (el) el.scrollBy({ left: -180, behavior: 'smooth' });
+    if (el) el.scrollBy({ left: -528, behavior: 'smooth' }); // Scroll exactly 4 items width
   };
   const onScrollRight = () => {
     const el = document.getElementById('dishes-scroll');
-    if (el) el.scrollBy({ left: 180, behavior: 'smooth' });
+    if (el) el.scrollBy({ left: 528, behavior: 'smooth' }); // Scroll exactly 4 items width
   };
   const onScroll = (_e: React.UIEvent<HTMLDivElement>) => {};
   const onMouseDown = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -76,9 +74,9 @@ export default function MenuSection({
 
   return (
     <div style={{ 
-      width: `${containerWidth}px`,
+      width: '100%',
       height: `${containerHeight}px`,
-      background: '#D9D9D9', 
+      background: '#FFFFFF', 
       borderRadius: '16px', 
       overflow: 'hidden'
     }}>
@@ -102,20 +100,20 @@ export default function MenuSection({
         />
       </div>
 
-      <div style={{ padding: '16px', height: 'calc(100% - 80px)' }}>
+      <div style={{ padding: '16px', height: 'calc(100% - 80px)', background: '#FFFFFF' }}>
         <div style={{ marginBottom: '16px' }}>
           <Space wrap>
             {categories.map(category => (
               <Button
                 key={category.id}
-                type={selectedCategory === category.id ? 'primary' : 'default'}
+                type={selectedCategory === category.id ? 'default' : 'default'}
                 onClick={() => setSelectedCategory(category.id)}
                 style={{ 
                   borderRadius: '20px',
-                  backgroundColor: selectedCategory === category.id ? '#1A72DD' : 'white',
-                  borderColor: selectedCategory === category.id ? '#1A72DD' : '#d9d9d9',
-                  color: selectedCategory === category.id ? 'white' : '#666',
-                  border: '1px solid #d9d9d9'
+                  backgroundColor: selectedCategory === category.id ? '#5296E5' : 'white',
+                  borderColor: '#5296E5',
+                  color: selectedCategory === category.id ? 'white' : '#5296E5',
+                  border: '1px solid #5296E5'
                 }}
               >
                 {category.name}
@@ -129,7 +127,12 @@ export default function MenuSection({
           <Button type="primary" icon={<RightOutlined />} onClick={onScrollRight} style={{ width: '32px', height: '32px', borderRadius: '50%', backgroundColor: '#1A72DD', borderColor: '#1A72DD', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0 }} />
         </div>
 
-        <div style={{ position: 'relative' }}>
+        <div style={{ 
+          position: 'relative',
+          display: 'flex',
+          justifyContent: 'center',
+          width: '100%'
+        }}>
           <style>{`#dishes-scroll::-webkit-scrollbar{display:none;}#dishes-scroll{-ms-overflow-style:none;scrollbar-width:none;}`}</style>
           <div 
             id="dishes-scroll"
@@ -145,7 +148,8 @@ export default function MenuSection({
               alignItems: 'flex-start',
               scrollBehavior: 'smooth',
               cursor: 'grab',
-              userSelect: 'none'
+              userSelect: 'none',
+              width: '100%'
             }}
             onScroll={onScroll}
             onMouseDown={onMouseDown}
@@ -157,8 +161,8 @@ export default function MenuSection({
               <div
                 key={dish.id}
                 style={{
-                  minWidth: '160px',
-                  maxWidth: '160px',
+                  minWidth: '140px',
+                  maxWidth: '140px',
                   height: '200px',
                   background: 'white',
                   borderRadius: '16px',
@@ -181,7 +185,9 @@ export default function MenuSection({
                     )}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', height: '32px' }}>
-                    <Text strong style={{ color: '#1A72DD', fontSize: '13px' }}>{dish.currency} {dish.price.toFixed(2)}</Text>
+                    <Text strong style={{ color: '#1A72DD', fontSize: '13px', whiteSpace: 'nowrap' }}>
+                      VND {dish.price.toLocaleString('vi-VN')}
+                    </Text>
                     <Button type="primary" icon={<PlusOutlined />} onClick={() => onAddDish(dish)} style={{ width: '24px', height: '24px', borderRadius: '10px', backgroundColor: '#1A72DD', borderColor: '#1A72DD', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 0, boxShadow: '0 2px 4px rgba(0,0,0,0.2)', minWidth: '24px', flexShrink: 0, fontSize: '12px', fontWeight: 'bold' }} />
                   </div>
                 </div>
