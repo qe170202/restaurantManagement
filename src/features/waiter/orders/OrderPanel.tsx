@@ -148,8 +148,8 @@ const OrderPanel: React.FC<OrderPanelProps> = ({
           // Get current dish price from dishes array
           const currentDish = dishes.find(d => d.id === item.dishId);
           const currentPrice = currentDish ? currentDish.price : item.price;
-          
-          return (
+
+  return (
             <div key={item.id} style={{
               display: 'flex',
               alignItems: 'center',

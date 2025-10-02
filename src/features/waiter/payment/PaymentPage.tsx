@@ -19,7 +19,7 @@ import {
   DollarOutlined,
   QrcodeOutlined,
   CheckCircleOutlined,
-  ExclamationCircleOutlined
+  
 } from '@ant-design/icons';
 import { useNavigate, useLocation } from 'react-router-dom';
 import type { Order } from '../../../types/tableManagement';

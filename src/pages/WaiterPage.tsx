@@ -270,7 +270,7 @@ const WaiterPage: React.FC = () => {
   return (
     <Layout style={{ minHeight: '100vh', background: '#f5f5f5' }}>
       <Header />
-      <Content style={{ padding: '24px' }}>
+      <Content style={{ padding: '24px', position: 'relative' }}>
         <Row gutter={[24, 24]} style={{ height: 'calc(100vh - 120px)' }}>
           <Col span={16}>
             <Row gutter={[24, 24]} style={{ height: '100%' }}>
